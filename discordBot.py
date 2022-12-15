@@ -3,73 +3,74 @@ import time
 
 import discord
 from decouple import config
+from discord import app_commands
 
 import autoRespone
-import openAIChat
+import slashGroup
 
-#調用 event 函式庫
-intents = discord.Intents.default()
-intents.message_content = True
-client = discord.Client(intents=intents)
 
-@client.event
-#當機器人完成啟動時
-async def on_ready():
-    print('機器人登入成功，目前登入身份：', client.user)
+class aClient(discord.Client):
+    def __init__(self):
+        intents = discord.Intents.default()
+        intents.message_content = True
+        super().__init__(intents=intents)
 
-@client.event
-#當有訊息時
-async def on_message(message):
-    #排除自己的訊息，避免陷入循環
-    if message.author == client.user:
-        return
+    #當機器人完成啟動時
+    async def on_ready(self):
+        await tree.sync()
+        print('機器人登入成功，目前登入身份：', self.user)
         
+    #當有訊息時
+    async def on_message(self, message):
+        #排除自己的訊息，避免陷入循環
+        if message.author == self.user:
+            return
+            
+        if message.content != '':
+            #自動回應字典訊息 ex.笑死
+            response = autoRespone.response(message.content)
+            if response != '':
+                now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+                print(now, message.author.name)
+                print(message.content)
+                await message.channel.send(response)
+                
+
+client = aClient()
+
+tree = app_commands.CommandTree(client)
+
+### 載入指令群組 ###
+tree.add_command(slashGroup.ai())
+
+##################
+
+### 載入單一指令區塊 ###
+#查詢南部公務人員會計職缺
+#/back_tainan
+@tree.command(name="back_tainan", description="查詢南部公務人員會計職缺")
+async def back_tainan(interaction: discord.Interaction) -> None:
     now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-    if message.content != '':
-        #自動回應字典訊息
-        response = autoRespone.response(message.content)
-        if response != '':
-            print(str(now) + ' ' + str(message.author.name))
-            print(message.content)
-            await message.channel.send(response)
+    print(now, interaction.user, '查詢職缺')
+    
+    await interaction.response.send_message('連線中...')
+    os.chdir("D:\opening_alert")
+    os.startfile("runSchedule.bat")
+    await interaction.channel.send('查詢完畢')
 
-        #更改機器人狀態
-        if message.content.startswith('Angel正在玩'):
-            target = message.content.split(" ",2)
-            if len(target) > 1:
-                game = discord.Game(target[1])
-                await client.change_presence(activity=game)
+#更改機器人狀態
+#/change_presence
+@tree.command(name="change_presence", description="更改機器人狀態")
+async def change_presence(interaction: discord.Interaction, text: str) -> None:
+    now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+    print(now, interaction.user, '更改狀態')
+    print(text)
+    
+    game = discord.Game(text)
+    await interaction.client.change_presence(activity=game)
+    await interaction.response.send_message('更改完畢')
 
-        #查詢南部公務人員會計職缺
-        if message.content.startswith('回台南'):
-            print(str(now) + ' ' + str(message.author.name))
-            print(message.content)
-            await message.channel.send('連線中...')
-            os.chdir("D:\opening_alert")
-            os.startfile("runSchedule.bat")
-        
-        #呼叫openAI生成文字
-        if message.content.startswith('87AI:'):
-            print(str(now) + ' ' + str(message.author.name))
-            print(message.content)
-            await message.channel.send('休蛋幾累 思考中...')
-            response = openAIChat.openai_response(message.content.split("87AI:")[1])
-            await message.channel.send(str(response))
-        
-        #呼叫openAI生成圖片
-        if message.content.startswith('IMG87AI:'):
-            print(str(now) + ' ' + str(message.author.name))
-            print(message.content)
-            await message.channel.send('休蛋幾累 生成中...')
-            response = openAIChat.openai_generalIMG(message.content.split("IMG87AI:")[1])
-            await message.channel.send(str(response))
+##################
 
-
-@client.event
-#錯誤訊息
-async def on_error(event, *args, **kwargs):
-    error_msg = args[0] #Gets the message object
-    print('error:')
-    print(error_msg)
 
 client.run(config('DISCORD_BOT_TOKEN'))
