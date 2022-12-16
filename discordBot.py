@@ -1,4 +1,3 @@
-import os
 import time
 
 import discord
@@ -18,7 +17,8 @@ class aClient(discord.Client):
     #當機器人完成啟動時
     async def on_ready(self):
         await tree.sync()
-        print('機器人登入成功，目前登入身份：', self.user)
+        now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+        print(now, '機器人登入成功，目前登入身份：', self.user)
         
     #當有訊息時
     async def on_message(self, message):
@@ -37,40 +37,8 @@ class aClient(discord.Client):
                 
 
 client = aClient()
-
 tree = app_commands.CommandTree(client)
-
-### 載入指令群組 ###
-tree.add_command(slashGroup.ai())
-
-##################
-
-### 載入單一指令區塊 ###
-#查詢南部公務人員會計職缺
-#/back_tainan
-@tree.command(name="back_tainan", description="查詢南部公務人員會計職缺")
-async def back_tainan(interaction: discord.Interaction) -> None:
-    now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-    print(now, interaction.user, '查詢職缺')
-    
-    await interaction.response.send_message('連線中...')
-    os.chdir("D:\opening_alert")
-    os.startfile("runSchedule.bat")
-    await interaction.channel.send('查詢完畢')
-
-#更改機器人狀態
-#/change_presence
-@tree.command(name="change_presence", description="更改機器人狀態")
-async def change_presence(interaction: discord.Interaction, text: str) -> None:
-    now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-    print(now, interaction.user, '更改狀態')
-    print(text)
-    
-    game = discord.Game(text)
-    await interaction.client.change_presence(activity=game)
-    await interaction.response.send_message('更改完畢')
-
-##################
-
+#載入指令群組
+tree.add_command(slashGroup.a())
 
 client.run(config('DISCORD_BOT_TOKEN'))
