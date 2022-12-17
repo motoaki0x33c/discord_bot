@@ -22,6 +22,7 @@ class a(app_commands.Group):
         print(now, interaction.user, '說：')
         print(text)
         
+        await interaction.channel.send('> *' + text + '*')
         await interaction.response.send_message('休蛋幾累 思考中...')
         response = openAIChat.openai_response(text)
         await interaction.channel.send(str(response))
@@ -33,6 +34,7 @@ class a(app_commands.Group):
         print(now, interaction.user, '說：')
         print(text)
         
+        await interaction.channel.send('> *' + text + '*')
         await interaction.response.send_message('休蛋幾累 生成中...')
         response = openAIChat.openai_generalIMG(text)
         await interaction.channel.send(str(response))
