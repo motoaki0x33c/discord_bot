@@ -16,7 +16,7 @@ class a(app_commands.Group):
     ai = app_commands.Group(name="ai", description="AI 指令集")
     
     #AI聊天 /ai chat
-    @ai.command(name="chat", description="輸入文字與 openAI 取得訊息")
+    @ai.command(name="chat", description="輸入文字與 openAI 取得廢文")
     async def chat(self, interaction: discord.Interaction, text: str) -> None:
         now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
         print(now, interaction.user, '說：')
@@ -24,7 +24,7 @@ class a(app_commands.Group):
         
         await interaction.channel.send('> *' + text + '*')
         await interaction.response.send_message('休蛋幾累 思考中...')
-        response = openAIChat.openai_response(text)
+        response = openAIChat.openai_response(text, temperature=0.9, presence_penalty=0.6)
         await interaction.channel.send(str(response))
         
     #AI生圖片 /ai img
@@ -39,6 +39,29 @@ class a(app_commands.Group):
         response = openAIChat.openai_generalIMG(text)
         await interaction.channel.send(str(response))
         
+    #AI問答 /ai anwser
+    @ai.command(name="anwser", description="輸入文字與 openAI 取得精準問答")
+    async def anwser(self, interaction: discord.Interaction, text: str) -> None:
+        now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+        print(now, interaction.user, '說：')
+        print(text)
+        
+        await interaction.channel.send('> *' + text + '*')
+        await interaction.response.send_message('休蛋幾累 思考中...')
+        response = openAIChat.openai_response(text)
+        await interaction.channel.send(str(response))
+        
+    #AI程式方面 /ai program
+    @ai.command(name="program", description="輸入文字與 openAI 取得程式面向的問答")
+    async def program(self, interaction: discord.Interaction, text: str) -> None:
+        now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+        print(now, interaction.user, '說：')
+        print(text)
+        
+        await interaction.channel.send('> *' + text + '*')
+        await interaction.response.send_message('休蛋幾累 思考中...')
+        response = openAIChat.openai_response(text, model='code-davinci-002')
+        await interaction.channel.send(str(response))
     
     ### 單一指令 ###
     

@@ -2,17 +2,17 @@ import openai
 from decouple import config
 
 
-def openai_response(message: str) -> str:
+def openai_response(message: str, model='text-davinci-003', temperature = 0, top_p = 1, max_tokens = 1024, frequency_penalty = 0, presence_penalty = 0) -> str:
     try:
         openai.api_key = config('OPEN_AI_KEY')
         response = openai.Completion.create(
-            model = "text-davinci-003",
+            model = model,
             prompt = message,
-            temperature = 0.3,
-            max_tokens = 1024,
-            top_p = 1,
-            frequency_penalty = 0,
-            presence_penalty = 0,
+            temperature = temperature,
+            max_tokens = max_tokens,
+            top_p = top_p,
+            frequency_penalty = frequency_penalty,
+            presence_penalty = presence_penalty,
         )
         
         return response.get("choices")[0]["text"]
