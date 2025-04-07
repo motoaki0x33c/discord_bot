@@ -1,5 +1,5 @@
 # Angel's discord_bot
-私人再用的Discord Bot
+私人用的Discord Bot，用於串接 chatgpt api
 
 ## 安裝
 1. 安裝[Python](https://www.python.org/)
